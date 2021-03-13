@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>박민곤, 강태석</title>
+    <style>
+    body {
+        background: url(media/webBackground.png) no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+        text-align: center;
+    }
+
+    #bodycanvas {
+        background-color: #fff6d2;
+    }
+
+    .container {
+        padding: 2em;
+    }
+
+    canvas {
+        display: block;
+        background: #59ABE3;
+        margin: 0 auto;
+    }
+    </style>
+    <script>
+    var newWin = null;
+    var canvas = null;
+    var context = null;
+    var loadCount = 0;
+    var board_img = null;
+    var start_img = null;
+    var Ap = null;
+    var A = null;
+    var Bp = null;
+    var B = null;
+    var Cp = null;
+    var C = null;
+    var Dp = null;
+    var D = null;
+    var F = null;
+
+    function pageload(URL) {
+        newWin = window.open(URL, "_self", "left=300,top=300,width=800,height=500");
+    }
+
+    function init() {
+        canvas = document.getElementById("bodycanvas");
+        context = canvas.getContext("2d");
+        load();
+
+        canvas.addEventListener("mousedown", function(e) { down(e) }, false); //캔버스에 이벤트리스너 등록
+    }
+
+    function down(e) {
+        if (e.offsetX > 750 && e.offsetX < 1150)
+            if (e.offsetY > 780 && e.offsetY < 880)
+                pageload('level_select.html'); // 마우스다운 좌표가 (750~1150, 780~880)일 때 pageload함수 호출
+    }
+
+    function load() {
+        board_img = new Image();
+        board_img.onload = loadCheck;
+        board_img.src = "media/board.png";
+
+        start_img = new Image();
+        start_img.onload = loadCheck;
+        start_img.src = "media/start_btn.png";
+
+        Ap = new Image();
+        Ap.onload = loadCheck;
+        Ap.src = "media/A+.png";
+
+        A = new Image();
+        A.onload = loadCheck;
+        A.src = "media/A.png";
+
+        Bp = new Image();
+        Bp.onload = loadCheck;
+        Bp.src = "media/B+.png";
+
+        B = new Image();
+        B.onload = loadCheck;
+        B.src = "media/B.png";
+
+        Cp = new Image();
+        Cp.onload = loadCheck;
+        Cp.src = "media/C+.png";
+
+        C = new Image();
+        C.onload = loadCheck;
+        C.src = "media/C.png";
+
+        Dp = new Image();
+        Dp.onload = loadCheck;
+        Dp.src = "media/D+.png";
+
+        D = new Image();
+        D.onload = loadCheck;
+        D.src = "media/D.png";
+
+        F = new Image();
+        F.onload = loadCheck;
+        F.src = "media/F.png";
+    }
+
+    function loadCheck() {
+        if (++loadCount >= 11) {
+            context.drawImage(board_img, 370, 150, 1200, 600);
+            context.drawImage(start_img, 750, 780, 400, 100);
+            context.drawImage(Ap, 20, 100, 125, 75);
+            context.drawImage(A, 1700, 400, 125, 75);
+            context.drawImage(Bp, 4, 482, 125, 75);
+            context.drawImage(B, 156, 242, 200, 150);
+            context.drawImage(Cp, 110, 708, 250, 175);
+            context.drawImage(C, 1624, 123, 150, 90);
+            context.drawImage(Dp, 1610, 708, 225, 150);
+            context.drawImage(D, 153, 524, 125, 75);
+            context.drawImage(F, 1353, 8, 125, 75);
+            drawText();
+        }
+
+    }
+
+    function drawText() {
+        context.font = "95px Comic Sans MS";
+        context.lineWidth = 5;
+        context.fillStyle = "#f89343";
+        context.fillText("Block Crash!", 680, 100);
+
+        context.beginPath();
+        context.moveTo(685, 130);
+        context.lineTo(1220, 130);
+        context.strokeStyle = "green";
+        context.stroke();
+
+        context.fillStyle = "white";
+        context.fillText("Credit", 830, 280);
+        context.font = "24px serif";
+        context.fillText("제작자", 1345, 550);
+        context.fillText("게임-박민곤", 1340, 600);
+        context.fillText("웹페이지-강태석", 1300, 650);
+        context.font = "30px serif";
+        context.fillText("블럭깨기 게임입니다. 하나의 블럭이 총 8가지의 블럭으로", 440, 340);
+        context.fillText("각 블럭마다 속성이 다릅니다. 난이도는 3개로 나뉘며", 440, 380);
+        context.fillText("난이도가 올라갈수록 속도가 빨라지고 특별한 속성이 부여됩니다.", 440, 420);
+        context.fillText("블럭의 체력이 절반이하로 떨어졌을 경우 F블럭으로 잠깐 변하는데 ", 440, 460);
+        context.fillText("그때 총알을 맞을경우 많은 체력이 회복됩니다. ", 440, 500);
+        context.fillText("hard모드에서 a+,a는 적은 체력을 회복합니다. ", 440, 540);
+        context.fillText("블럭과 부딪힐경우 게임은 종료되고 체력을 0으로 만든경우 ", 440, 580);
+        context.fillText("게임이 끝나며 시간에 따라 채점결과가 나옵니다.", 440, 620);
+    }
+    </script>
+</head>
+
+<body onload="init()">
+    <canvas id="bodycanvas" width="1850px" height="920px">
+    </canvas>
+</body>
+
+</html>

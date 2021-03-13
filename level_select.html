@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>난이도 선택</title>
+    <style>
+    body {
+        background: url(media/webBackground.png) no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
+    .container {
+        padding: 2em;
+    }
+
+    #title {
+        font: 50px Comic Sans MS;
+    }
+
+    .center.aligned {
+        text-align: center;
+    }
+
+    canvas {
+        display: block;
+        background: #59ABE3;
+        margin: 0 auto;
+    }
+    </style>
+    <script>
+    var canvas = null;
+    var context = null;
+    var loadCount = 0;
+    var board = null;
+    var img1 = null;
+    var img2 = null;
+    var img3 = null;
+
+    function getData(xmlFile) { // xmlfile을 웹 서버로부터 다운로드 받는다.
+        // HTTP 비동기 객체 만들기
+        var req = new XMLHttpRequest();
+
+        // 요청 패킷 만들기
+        req.open("GET", xmlFile, true);
+
+        // 캐시된 testxml2.xml을 무시하고 서버로부터 받도록 요청 패킷제 설벙
+        req.setRequestHeader("Cache-Control", "no-cache"); // ope() 이후에 호출되어야 함
+
+        // 서버로부터 응답을 받은 리스너 등록.
+        // req.send() 전에 등록하는 것이 정상적인 코딩임.
+        // 리스너를 등록하는 사이에 응답이 올지도 모르기 때문
+        req.onreadystatechange = function() {
+            if (this.readyState != 4 || this.status != 200)
+                return;
+            window.open("http://localhost/1592012/BlockCrash1.html", "_parent", "left=300,top=300,width=1600,height=1000");
+        }
+
+        req.send(); // 요청 패킷 전송. 이 패킷을 받은 서버는 요청에 들어 있는 파일을 찾아 전송.
+        // 서버로부터 응답이 오면 onreadystatechanged 리스너 호출
+    }
+
+    function init() {
+        canvas = document.getElementById("canvas");
+        context = canvas.getContext("2d");
+        load();
+        canvas.addEventListener("mousedown", down, false);
+    }
+
+    function load() {
+        board = new Image();
+        board.onload = loadCheck;
+        board.src = "media/board.png"
+
+        img1 = new Image();
+        img1.onload = loadCheck;
+        img1.src = "media/easy.png";
+
+        img2 = new Image();
+        img2.onload = loadCheck;
+        img2.src = "media/normal.png";
+
+        img3 = new Image();
+        img3.onload = loadCheck;
+        img3.src = "media/study.png";
+    }
+
+    function loadCheck() {
+        if (++loadCount >= 4) {
+            context.drawImage(board, 0, 0, canvas.width, canvas.height);
+            context.drawImage(img1, 100, 100, 180, 280);
+            context.drawImage(img2, 415, 80, 200, 300);
+            context.drawImage(img3, 730, 100, 200, 300);
+            drawText();
+        }
+
+    }
+
+    function drawText() {
+        context.font = "40px Comic Sans MS";
+        context.lineWidth = 3;
+        context.fillStyle = "white";
+        context.fillText("Easy", 136, 400);
+        context.fillText("Normal", 450, 400);
+        context.fillText("Hard", 777, 400);
+    }
+
+    function down(e) {
+        //Easy
+        if (e.offsetX > 100 && e.offsetX < 280 &&
+            e.offsetY > 100 && e.offsetY < 380)
+            window.open("http://localhost/1592012/BlockCrash1.html", "_parent", "left=300,top=300,width=1600,height=1000");
+           /* getData("http://localhost/BlockCrash_E.xml");*/
+        //Normal
+        else if (e.offsetX > 415 && e.offsetX < 615 &&
+            e.offsetY > 80 && e.offsetY < 380)
+            window.open("http://localhost/1592012/BlockCrash2.html", "_parent", "left=300,top=300,width=1600,height=1000");
+            /*getData("http://localhost/BlockCrash_N.xml");*/
+        //Hard
+        else if (e.offsetX > 730 && e.offsetX < 930 &&
+            e.offsetY > 100 && e.offsetY < 400)
+            window.open("http://localhost/1592012/BlockCrash3.html", "_parent", "left=300,top=300,width=1600,height=1000");
+           /* getData("http://localhost/BlockCrash_H.xml");
+*/
+    }
+    </script>
+</head>
+
+<body onload="init()">
+    <div class="center aligned container">
+        <h1 id="title">Level Select</h1>
+        <canvas id="canvas" width="1000" height="600"></canvas>
+    </div>
+</body>
+
+</html>

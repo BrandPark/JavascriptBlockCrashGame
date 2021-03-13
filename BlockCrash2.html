@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Block Crash!</title>
+    <style>
+    p {
+        font: bold 30px Comic Sans MS;
+        display: inline-block;
+        width: 10em;
+    }
+    p#title{
+        font-size:50px;
+        font-family:"Comic Sans MS";
+        margin-top:0;
+        margin-bottom:0;
+    }
+    body {
+        background: url(media/background.jpg) no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
+    .container {
+        padding: 2em;
+    }
+
+    .center.aligned {
+        text-align: center;
+    }
+    </style>
+    <script>
+    class Bullet {
+        constructor(x, y, bulletW, bulletH) {
+            this.x = x;
+            this.y = y;
+            this.w = bulletW;
+            this.h = bulletH;
+        }
+    }
+    class Block {
+        constructor(x, y, blockW, blockH) {
+            this.x = x;
+            this.y = y;
+            this.w = blockW;
+            this.h = blockH;
+            this.src = "";
+            this.speed = 0;
+            this.reverse = 0;
+            this.grade = "";
+            this.changeT = null;
+            this.defence = null;
+        }
+    }
+    ////////////////////////////블록게임 클래스
+    class BlockGame {
+        constructor(X, Y, canvas) {
+            this.canvas = canvas;
+            this.context = canvas.getContext("2d");
+
+            this.gunX = X;
+            this.gunY = Y;
+            this.gunWidth = xmlGun.getAttribute("w");
+            this.gunHeight = xmlGun.getAttribute("h");
+
+            this.bullets = [];
+            this.bulletW = xmlBullet.getAttribute("w");
+            this.bulletH = xmlBullet.getAttribute("h");
+
+            this.blockX = blockStartX;
+            this.blockY = blockStartY;
+            this.blockW = blockW;
+            this.blockH = blockH;
+            this.blockSpeed = 10;
+            this.directionBlockX = 1; //1:Right, -1:Left
+            this.directionBlockY = 2; //2:Down, -2: Up
+        }
+        //총알, 표적의 움직임
+        moveUnit() {
+
+            //총알 움직임
+            for (var i = 0; i < this.bullets.length; i++)
+                this.bullets[i].y -= bulletSpeed;
+            //오른쪽방향
+            if (this.directionBlockX == 1) {
+                //위쪽 방향
+                if (this.directionBlockY == -2) {
+                    this.blockX = parseInt(this.blockX) + this.blockSpeed;
+                    this.blockY = parseInt(this.blockY) - this.blockSpeed;
+                    if (parseInt(this.blockY) < 0) //위쪽 벽에 부딪힌 경우
+                        this.directionBlockY = 2;
+                    if (parseInt(this.blockX) + parseInt(this.blockW) > this.canvas.width) //오른쪽 벽에 부딪힌 경우
+                        this.directionBlockX = -1;
+                }
+                //아래 방향
+                else if (this.directionBlockY == 2) {
+                    this.blockX = parseInt(this.blockX) + this.blockSpeed;
+                    this.blockY = parseInt(this.blockY) + this.blockSpeed;
+                    if (parseInt(this.blockY) + parseInt(this.blockH) > this.canvas.height) //바닥에 부딪힌 경우
+                        this.directionBlockY = -2;
+                    if (parseInt(this.blockX) + parseInt(this.blockW) > this.canvas.width) //오른쪽 벽에 부딪힌 경우
+                        this.directionBlockX = -1;
+                }
+            }
+            //왼쪽 방향
+            else if (this.directionBlockX == -1) {
+                //위쪽 방향
+                if (this.directionBlockY == -2) {
+                    this.blockX = parseInt(this.blockX) - this.blockSpeed;
+                    this.blockY = parseInt(this.blockY) - this.blockSpeed;
+                    if (parseInt(this.blockY) < 0) //위쪽 벽에 부딪힌 경우
+                        this.directionBlockY = 2;
+                    if (parseInt(this.blockX) < 0) //왼쪽 벽에 부딪힌 경우
+                        this.directionBlockX = 1;
+                }
+                //아래 방향
+                else if (this.directionBlockY == 2) {
+                    this.blockX = parseInt(this.blockX) - this.blockSpeed;
+                    this.blockY = parseInt(this.blockY) + this.blockSpeed;
+                    if (parseInt(this.blockY) + parseInt(this.blockH) > this.canvas.height) //바닥에 부딪힌 경우
+                        this.directionBlockY = -2;
+                    if (parseInt(this.blockX) < 0) //왼쪽 벽에 부딪힌 경우
+                        this.directionBlockX = 1;
+                }
+            }
+        }
+        //총알 발사(추가)
+        addBullet() {
+            this.bullets.push(new Bullet(this.gunX + 7, this.gunY, this.bulletW, this.bulletH));
+            shotSpeed = 0;
+        }
+        //그리기 함수
+        draw() {
+            //canvasClear
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            //배경 삽입
+            this.drawBackground();
+            //블럭 삽입*/
+            this.drawBlock();
+            //총 삽입
+            this.drawGun();
+            //총알 삽입
+            this.drawBullet();
+        }
+        //게임오버 메세지 출력함수
+        drawGameOver() {
+            if (gameover) {
+                context.fillStyle = "rgba(255, 255, 255, 0.5)";
+                context.textAlign = "center";
+                context.font = "100px Comic Sans MS";//글자크기, 글자체
+                context.fillStyle = '#A19D9D'; //글자색깔
+                context.fillText("F!", canvas.width / 2, canvas.height / 2 - 60);//글자,x좌표,y좌표
+                context.font = "40px Comic Sans MS";
+                context.fillStyle = '#A19D9D';
+                context.fillText(timeText, canvas.width / 2, canvas.height / 2+60);
+                context.fillStyle = '#F7CA18';
+                context.fillText("Press F5 to JaeSuGang!", canvas.width / 2, 4 * canvas.height / 5);
+
+            }
+        }
+        //게임클리어 메세지 출력함수
+        drawGameClear() {
+            if (gameclear) {
+                context.fillStyle = "rgba(255, 255, 255, 0.5)";
+                context.textAlign = "center";
+                context.font = "60px Comic Sans MS";
+                context.fillStyle = '#F7CA18';
+                context.fillText("Finish!", canvas.width / 2, canvas.height / 2 - 60);
+                context.fillStyle = '#F7CA18';
+                context.fillText(timeText, canvas.width / 2, canvas.height / 2 + 20);
+                context.font = "80px Comic Sans MS";
+                context.fillStyle = 'red';
+                context.fillText(this.examinate(), canvas.width / 2, canvas.height / 2 + 90);
+
+                context.font = "40px Comic Sans MS";
+                context.fillStyle = '#F7CA18';
+                context.fillText("Press F5 to JaeSuGang!", canvas.width / 2, 4 * canvas.height / 5);
+            }
+        }
+        examinate(){
+            var time= minutes*60 + seconds;
+            if(time>60) return "D!";
+            else if(time>40) return "D+!";
+            else if(time>35) return "C!";
+            else if(time>30) return "C+!";
+            else if(time>25) return "B!";
+            else if(time>20) return "B+!";
+            else if(time>15) return "A!";
+            else return "A+!!";
+        }
+        //배경 그리기 함수
+        drawBackground() {
+            this.context.drawImage(backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
+        }
+        //총 그리기 함수
+        drawGun() {
+            //타겟이랑 충돌시 이펙트
+            if (parseInt(this.blockX) < parseInt(this.gunX) + parseInt(this.gunWidth) &&
+                parseInt(this.blockX + parseInt(this.blockW)) > parseInt(this.gunX) &&
+                parseInt(this.blockY) + parseInt(this.blockH) >= parseInt(this.gunY)) {
+
+                this.context.drawImage(crashImage, this.gunX, this.gunY * 1 - 50, 200, 150);
+                gameover = true;
+                this.drawGameOver();
+                clearTimeout(timerID2);
+                clearInterval(timerID);
+            }
+            this.context.drawImage(gunImage, this.gunX, this.gunY, this.gunWidth, this.gunHeight);
+
+
+        }
+        //총알 그리기 함수
+        drawBullet() {
+
+            for (var i = 0; i < this.bullets.length; i++) {
+                //총알 제거
+                if (this.bullets[i].y <= 0) {
+                    this.bullets = this.bullets.slice(0, i).concat(this.bullets.slice(i + 1));
+                    continue;
+                }
+                //총알 hit판정
+                else {
+                    if (parseInt(this.bullets[i].x) + parseInt(this.bullets[i].w) > parseInt(this.blockX) &&
+                        parseInt(this.bullets[i].x) < parseInt(this.blockX) + parseInt(this.blockW) &&
+                        parseInt(this.bullets[i].y) < parseInt(this.blockY) + parseInt(this.blockH)) {
+                        //hit 이미지 출력
+                        this.drawEffect();
+                        //명중시 체력 감소
+                        prog.value = prog.value + parseInt(blocks[currentBlock].defence) - 10;
+                        //체력이 50미만이되면 한번 F블럭으로 변한다.
+                        if (heal && parseInt(prog.value) <= parseInt(prog.max) / 2) {
+                            currentBlock = 8;
+                            heal = false;
+                        }
+                        //체력이 0이하가되면 게임클리어
+                        if (prog.value <= 0) {
+                            gameclear = true;
+                            this.drawGameClear();
+                            clearInterval(timerID);
+                            clearTimeout(timerID2);
+                        }
+
+
+                        //표적에 명중한 총알 제거
+                        this.bullets = this.bullets.slice(0, i).concat(this.bullets.slice(i + 1));
+                        continue;
+
+                    }
+                    this.context.drawImage(bulletImage, this.bullets[i].x, this.bullets[i].y, this.bulletW, this.bulletH);
+                }
+            }
+        }
+        drawEffect(){
+            this.context.drawImage(hitImage, this.blockX, this.blockY, 100, 100); 
+        }
+        drawBlock() {
+            this.context.drawImage(blockImage[currentBlock], this.blockX, this.blockY, this.blockW, this.blockH);
+            this.blockSpeed = parseInt(blocks[currentBlock].speed);
+        }
+    }
+    var canvas = null;
+    var context = null;
+    var xmlBg = null;
+    var xmlSize = null;
+    var xmlGun = null;
+    var xmlBullet = null;
+    var xmlBlock = null;
+    var xmlBlockOption = null;
+    var xmlHit = null;
+    var xmlCrash = null;
+
+    var BG = null;
+    var timerID = null;
+    var blocks = [];
+    var loadCount = 0;
+    var startX = null;
+    var startY = null;
+    var backgroundImage = null;
+    var gunImage = null;
+    var bulletImage = null;
+    var crashImage = null;
+    var hitImage = null;
+    var gunCurX = null;
+    var shoot = null;
+    var bulletSpeed = 15;
+    var shotSpeed = 0;
+    var blockImage = [];
+    var blockStartX = null;
+    var blockStartY = null;
+    var blockW = null;
+    var blockH = null;
+    var currentBlock = 3;
+
+    var prog = null;
+    var gameover = false;
+    var gameclear = false;
+    var heal = true;
+    var seconds = 0;
+    var minutes = 0;
+    var timeText="timer 0:0";
+    var timerID2=null;
+    function loadXML(xmlFile) { // xmlfile을 웹 서버로부터 다운로드 받는다.
+        // HTTP 비동기 객체 만들기
+        var req = new XMLHttpRequest();
+
+        // 요청 패킷 만들기
+        req.open("GET", xmlFile, true);
+
+        // 캐시된 testxml2.xml을 무시하고 서버로부터 받도록 요청 패킷제 설벙
+        req.setRequestHeader("Cache-Control", "no-cache"); // ope() 이후에 호출되어야 함
+
+        // 서버로부터 응답을 받은 리스너 등록.
+        // req.send() 전에 등록하는 것이 정상적인 코딩임.
+        // 리스너를 등록하는 사이에 응답이 올지도 모르기 때문
+        req.onreadystatechange = function() {
+            if (this.readyState != 4 || this.status != 200)
+                return;
+            xmlInit(this.responseXML);
+            init();
+        }
+
+        req.send(); // 요청 패킷 전송. 이 패킷을 받은 서버는 요청에 들어 있는 파일을 찾아 전송.
+        // 서버로부터 응답이 오면 onreadystatechanged 리스너 호출
+    }
+
+    function xmlInit(xmlDoc) {
+        xmlBg = xmlDoc.getElementsByTagName("Bg")[0];
+        xmlSize = xmlDoc.getElementsByTagName("Size")[0];
+        xmlGun = xmlDoc.getElementsByTagName("Gun")[0];
+        xmlBullet = xmlDoc.getElementsByTagName("Bullet")[0];
+        xmlBlock = xmlDoc.getElementsByTagName("Obj");
+        xmlBlockOption = xmlDoc.getElementsByTagName("Blocks")[0];
+        xmlCrash = xmlDoc.getElementsByTagName("Crash")[0];
+        xmlHit = xmlDoc.getElementsByTagName("Hit")[0];
+    }
+
+    function init() {
+        canvas = document.getElementById("myCanvas");
+        context = canvas.getContext("2d");
+        canvas.width = xmlSize.getAttribute("w");
+        canvas.height = xmlSize.getAttribute("h");
+
+        startX = xmlGun.getAttribute("x");
+        startY = xmlGun.getAttribute("y");
+        gunCurX = startX;
+
+        blockStartX = xmlBlockOption.getAttribute("x");
+        blockStartY = xmlBlockOption.getAttribute("y");
+        blockW = xmlBlockOption.getAttribute("w");
+        blockH = xmlBlockOption.getAttribute("h");
+        blockHealth = xmlBlockOption.getAttribute("health");
+        prog = document.getElementById("prog");
+        load();
+        HealthBar();
+        //이벤트 리스너 
+        canvas.addEventListener("mousemove", move, false);
+        canvas.addEventListener("mousedown", down, false);
+        canvas.addEventListener("mouseup", up, false);
+        canvas.addEventListener("mouseout", out, false);
+    }
+
+
+    //블럭 로드 함수
+    function loadBlock() {
+        for (let i = 0; i < xmlBlock.length; i++) {
+            blocks[i] = new Block(blockStartX, blockStartY, blockW, blockH);
+            blocks[i].src = xmlBlock[i].getAttribute("img");
+            blocks[i].speed = xmlBlock[i].getAttribute("speed");
+            blocks[i].reverse = xmlBlock[i].getAttribute("reverse");
+            blocks[i].changeT = xmlBlock[i].getAttribute("changeT");
+            blocks[i].defence = xmlBlock[i].getAttribute("defence");
+        }
+        loadCount++;
+    }
+    //체력 게이지 함수
+    function HealthBar() {
+        prog.setAttribute("value", blockHealth);
+        prog.setAttribute("max", blockHealth);
+        prog.style.backgroundColor="green";
+    }
+    //이미지 로드 함수
+    function load() {
+        loadBlock();
+        backgroundImage = new Image();
+        backgroundImage.onload = imageLoadComplete;
+        backgroundImage.src = xmlBg.getAttribute("img");
+
+        gunImage = new Image();
+        gunImage.onload = imageLoadComplete;
+        gunImage.src = xmlGun.getAttribute("img");
+
+        bulletImage = new Image();
+        bulletImage.onload = imageLoadComplete;
+        bulletImage.src = xmlBullet.getAttribute("img");
+
+        hitImage = new Image();
+        hitImage.onload = imageLoadComplete;
+        hitImage.src = xmlHit.getAttribute("img");
+
+        crashImage = new Image();
+        crashImage.onload = imageLoadComplete;
+        crashImage.src = xmlCrash.getAttribute("img");
+
+        for (var i = 0; i < blocks.length; i++) {
+            blockImage[i] = new Image();
+            blockImage[i].onload = imageLoadComplete;
+            blockImage[i].src = blocks[i].src;
+        }
+    }
+    //로드 체크 & 그리기 함수
+    function imageLoadComplete() {
+        if (++loadCount >= (6 + blocks.length)) {
+            BG = new BlockGame(startX, startY, canvas)
+            BG.draw();
+            //30밀리 세컨드마다 다시그리기
+            timerID = setInterval(gameLoad, 30);
+            setTimeout(changeBlock, 1000);
+            //타이머 시작
+            myTimer();
+        }
+    }
+    //블럭 체인지 함수
+    function changeBlock() {
+        currentBlock = Math.floor(Math.random() * 8);
+        setTimeout(changeBlock, blocks[currentBlock].changeT);
+        //방향 바꾸기
+        var directionReverseTime = Math.floor(Math.random() * 100 + 1);
+            if (directionReverseTime <= blocks[currentBlock].reverse) {
+                BG.directionBlockX *= -1;
+                BG.directionBlockY *= -1;
+            }
+
+    }
+    //타이머 함수
+    function myTimer(){
+        var time = document.getElementById("time");
+        timeText="timer "+minutes+" : "+seconds;
+        seconds++;
+        if(seconds==60){
+            minutes++;
+            seconds=0;
+        }
+        
+        time.innerHTML=timeText;
+        timerID2=setTimeout(myTimer,1000);
+    }
+    //게임 무한루프 함수
+    function gameLoad() {
+        update();
+        display();
+
+    }
+
+    function update() {
+        //마우스 위치 동기화
+        BG.gunX = gunCurX;
+        //총알 발사
+        shotSpeed += 15; //클수록 재발사 속도가 빨라짐
+        //총알 추가
+        if (shotSpeed >= 100)
+            if (shoot)
+                BG.addBullet();
+        //사라지고 남은 총알을 moving
+        BG.moveUnit();
+    }
+
+    function display(e) { BG.draw(); }
+
+    function move(e) { gunCurX = e.offsetX; }
+
+    function down(e) { shoot = true; }
+
+    function up(e) { shoot = false; }
+
+    function out(e) { shoot = false; }
+    </script>
+</head>
+
+<body onload="loadXML('BlockCrash_N.xml')">
+    <div class="center aligned container">
+        <p id="title">Block Crash!</p>
+        <div id="game">
+            <canvas id="myCanvas"></canvas>
+        </div>
+        <div id="info">
+            <p id="health">health<progress id="prog" min="0"></progress></p>
+            <p id="time"></p>
+        </div>
+        <audio src="media/normal.mp3" autoplay="true" loop controls></audio>
+    </div>
+</body>
+
+</html>

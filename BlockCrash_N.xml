@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BlockGame>
+    <Screen>
+        <Size w="600" h="500"></Size>
+    </Screen>
+
+    <GamePanel>
+        <Bg img="media/white.jpg"></Bg>
+        <Blocks x="300" y="100" w="70" h="70" health="250">
+           <Obj speed="15" reverse="100" defence="15" changeT="1000" img="media/A+.png" />
+           <Obj speed="15" reverse="40" defence="10" changeT="1000" img="media/A.png" />
+           <Obj speed="15" reverse="50" defence="9" changeT="1400" img="media/B+.png" />
+           <Obj speed="15" reverse="50" defence="8" changeT="1600" img="media/B.png" />
+           <Obj speed="15" reverse="80" defence="5" changeT="2000" img="media/C+.png" />
+           <Obj speed="15" reverse="85" defence="3" changeT="2500" img="media/C.png" />
+           <Obj speed="15" reverse="90" defence="2" changeT="2500" img="media/D+.png" />
+           <Obj speed="15" reverse="100" defence="1" changeT="3000" img="media/D.png" />
+           <Obj speed="10" reverse="1" defence="50" changeT="3000" img="media/F.png" />
+        </Blocks>
+         <Gun x="300" y="400" w="65" h="80" img="media/gun.png" />
+        <Bullet w="10" h="30" img="media/bullet.png" />
+        <Effects>
+            <Hit img="media/hit.png" />
+            <Crash img="media/crash.png" />
+        </Effects>
+    </GamePanel>
+</BlockGame>
+<!--체력 회복 있음  -->
+<!--방향 전환 있음  -->
+<!--체력 적당  -->
+<!--블럭 크기 작음  -->
+<!--속도 적당  -->
